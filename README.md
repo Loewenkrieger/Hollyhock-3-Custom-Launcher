@@ -1,70 +1,29 @@
-# Hollyhock 3 Custom Launcher — Public
+# Hollyhock 3 Custom Launcher
 
-Klassischer Launcher für den **Casio ClassPad II**, mit der Oberfläche im HHK2-Stil und ausschließlich **HH3-Apps (`.hh3`)**.
+Ein klassischer Launcher für **HH3-Apps (`.hh3`)** auf dem Casio ClassPad II. Mit übersichtlicher App-Auswahl, Programminfos und Bedienung per Touch oder Tasten.
 
-Version **0.5 Public**, für bereits installiertes Hollyhock 3 auf **OS 02.01.7002.0001**.
+**Version 0.5** · Für bereits installiertes Hollyhock 3 auf **OS 02.01.7002.0001**.
 
-## Download und Installation
+## Installation
 
-- [Installationspaket 0.5](downloads/v0.5/hhk3-public-launcher-0.5-os7002.zip)
-- [run.bin](downloads/v0.5/run.bin)
-- [Deutsche Anleitung](docs/README_DE.md)
-- [Prüfbericht](docs/TEST-REPORT.txt)
+[run.bin herunterladen](downloads/v0.5/run.bin) · [Komplettpaket](downloads/v0.5/hhk3-launcher-0.5-os7002.zip)
 
-Die vorhandene `run.bin` sichern und die neue Datei ins Hauptverzeichnis des Taschenrechner-Laufwerks kopieren. Apps ebenfalls direkt dort als `.hh3` ablegen. Sicher auswerfen, USB trennen und den Launcher wie bisher öffnen. **Kein Firmwareupdate erforderlich.**
+1. Die bisherige `run.bin` sichern.
+2. Die neue `run.bin` und deine `.hh3`-Apps ins Hauptverzeichnis des Taschenrechner-Laufwerks kopieren.
+3. Sicher auswerfen, USB trennen und den Launcher über das System-Menü öffnen.
 
-## Funktionen
+Ein Firmwareupdate ist dafür nicht nötig.
 
-- Klassische Oberfläche mit Dropdown, Run, Close und Programminformationen.
-- Direkte Touch-Ereignisverarbeitung sowie Pfeil-, EXE- und Clear-Tasten.
-- HH3-ELF-Loader; `.hhk`- und alte `.bin`-Apps erscheinen nicht in der Auswahl.
-- Rückkehr zur vorherigen Casio-Ansicht beim normalen Beenden über den geprüften OS-7002-Aufrufer. Bei verändertem Aufrufer bleibt der native Abschlussdialog erhalten.
+## Bedienung
 
-![Vorschau des Renderers](docs/preview/classic-closed.png)
+App im Dropdown auswählen und mit **Run** starten. **Close**, **X** oder **Clear** schließen den Launcher. Mit den Pfeiltasten und **EXE** geht es auch ohne Touch.
 
-## Varianten
+![Vorschau der Oberfläche](docs/preview/classic-closed.png)
 
-Die **Public-Version 0.5** enthält ausschließlich den HH3-Loader. HHK2-Loader, altes SDK, Adressübersetzung, alte Test-Apps und frühere Dual-Binärdateien gehören nicht zu diesem Repository oder den Downloadpaketen.
+Die Version wurde automatisiert geprüft; der abschließende Test am echten ClassPad steht noch aus.
 
-Die bisherige **Private-Version 0.4** mit HH3- und experimenteller HHK2-Unterstützung wird separat aufbewahrt. Das bestehende private Repository bleibt privat. [Details zur Trennung](docs/VARIANTS.md).
-
-## Prüfstand
-
-**36 automatisierte Prüfungen bestehen:** 25 für Oberfläche/Eingaben, 3 für die HH3-App-Suche und 8 für den Rückgabeweg einschließlich einer eng begrenzten SuperH-Instruktionssimulation. Der SuperH-Build und die mitgelieferte HH3-Test-App lassen sich kompilieren.
-
-**Version 0.5 wurde hier nicht am echten Taschenrechner getestet.** Die Tests führen keine gestarteten Apps auf Calculator-Hardware aus. Die Vorschauen stammen vom PC-Renderer.
-
-## Entwicklung
-
-Quellcode liegt unter `src/`, das HH3-SDK unter `sdk/`. Der normale Build verwendet die mitgelieferte Bitmap-Schrift.
-
-Hosttests benötigen Python 3 und g++ mit C++23:
-
-```sh
-python3 tests/test_classic.py
-python3 tests/test_discovery.py
-python3 tests/test_exit.py
-```
-
-Calculator-Build: `sh4a_nofpueb-elf-g++` 15.2.0 im PATH, `SDK_DIR` auf das gebaute HH3-SDK setzen:
-
-```sh
-sh build.sh
-sh build-smoke.sh
-```
-
-Ergebnisse: `dist/run.7002.bin` und `smoke/hh3/launcher-test.hh3`. Für den Taschenrechner die Launcher-Datei in `run.bin` umbenennen. Das genaue Toolchain-Image und die Quellrevisionen stehen in [BUILD.json](downloads/v0.5/BUILD.json).
-
-Das enthaltene SDK kann mit derselben Toolchain über `make -C sdk` gebaut werden; anschließend `SDK_DIR` auf den absoluten Pfad dieses Ordners setzen.
-
-Prüfung des kompilierten Rückgabeadapters:
-
-```sh
-python3 tests/test_exit.py --target-elf dist/run.7002.elf --target-bin dist/run.7002.bin
-```
+[Ausführliche Anleitung](docs/README_DE.md) · [Build und Tests](docs/BUILD.md) · [Prüfbericht](docs/TEST-REPORT.txt)
 
 ## Grundlagen und Lizenz
 
-Basierend auf [ClasspadDev/yal](https://github.com/ClasspadDev/yal) und dem [Hollyhock-3-SDK](https://github.com/ClasspadDev/hollyhock-3). Ursprüngliche Hinweise und Quellrevisionen bleiben erhalten.
-
-Code: [GPL-3.0](LICENSE). Für DejaVu Sans gilt die beiliegende [Schriftlizenz](src/classic/FONT-LICENSE.txt). Dieses Repository enthält keine Casio-Firmware und keinen Firmware-Updater.
+Basierend auf [YAL](https://github.com/ClasspadDev/yal) und dem [Hollyhock-3-SDK](https://github.com/ClasspadDev/hollyhock-3). Code unter [GPL-3.0](LICENSE), Schrift unter der beiliegenden [DejaVu-Lizenz](src/classic/FONT-LICENSE.txt).

@@ -1,7 +1,6 @@
 {
-  "name": "Hollyhock 3 Custom Launcher - Public",
+  "name": "Hollyhock 3 Custom Launcher",
   "version": "0.5",
-  "variant": "public",
   "target_os": "02.01.7002.0001",
   "formats": [
     "HH3 ELF (.hh3)"
@@ -45,15 +44,21 @@
     "source_image_sha256": "62c95f96df2c238282a4b208b9a970dbfbfd53c4aa70b938ae5cbb9c4cd06973"
   },
   "changes": [
-    "Separate public source tree and distribution",
-    "HH3 discovery only; legacy and binary loaders removed",
-    "HHK2 SDK, address maps, legacy parser/tests/smoke app and OS 2000 metadata removed",
-    "Classic input handling and guarded OS return from private 0.4 retained",
-    "Footer and empty-list instructions updated for 0.5 Public"
+    "Classic dropdown interface with direct touch and key input",
+    "HH3 app discovery and ELF loading",
+    "Guarded return to Casio OS 02.01.7002.0001",
+    "Source tree, documentation and installation package cleanup"
   ],
   "build_validation": {
     "bundled_sdk_build": true,
     "bundled_sdk_binary_matches_toolchain_sdk": true,
     "test_total": 36
+  },
+  "repository_cleanup_validation": {
+    "date": "2026-10-29",
+    "host_checks_passed": 34,
+    "distributed_target_consumer_checks_passed": 2,
+    "run_bin_unchanged": true,
+    "fresh_calculator_build": false
   }
 }
