@@ -26,6 +26,4 @@ Die Version wurde automatisiert geprüft; der abschließende Test am echten Clas
 
 [Ausführliche Anleitung](docs/README_DE.md) · [Build und Tests](docs/BUILD.md) · [Prüfbericht](docs/TEST-REPORT.txt)
 
-## Grundlagen und Lizenz
-
-Basierend auf [YAL](https://github.com/ClasspadDev/yal) und dem [Hollyhock-3-SDK](https://github.com/ClasspadDev/hollyhock-3). Code unter [GPL-3.0](LICENSE), Schrift unter der beiliegenden [DejaVu-Lizenz](src/classic/FONT-LICENSE.txt).
+Basierend auf [YAL](https://github.com/ClasspadDev/yal) und dem [Hollyhock-3-SDK](https://github.com/ClasspadDev/hollyhock-3).
