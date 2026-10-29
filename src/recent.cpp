@@ -36,8 +36,8 @@ History load() noexcept {
   try {
     History history;
     if (!MCS_GetVariableU) return history;
-    // The SDK's enum-pointer wrapper is unsuitable for a byte result on SH's
-    // big-endian ABI. Use the byte declaration directly on both platforms.
+    // OS 7002 writes one byte; with GCC 15.2.0 the SDK enum is four bytes.
+    // Use the SDK's byte declaration. Evidence and target test: docs/MCS-ABI.md.
     std::uint8_t type = 0;
     char *name = nullptr;
     void *data = nullptr;

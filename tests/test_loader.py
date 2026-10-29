@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Test real ELF metadata and compare its file operations with a source snapshot."""
 from pathlib import Path
+from sdk_path import sdk_include
 import argparse
 import json
 import os
@@ -42,7 +43,7 @@ with tempfile.TemporaryDirectory() as temporary:
     binary = Path(temporary) / 'loader-probe'
     subprocess.run(['g++', '-std=c++23', '-O1', '-g', '-Wall', '-Wextra', '-Werror',
                     '-Wno-attributes', '-fsanitize=address,undefined', '-fno-sanitize-recover=all',
-                    '-I' + str(source / 'src'), '-I' + str(source / 'sdk/include'),
+                    '-I' + str(source / 'src'), '-I' + str(sdk_include(source)),
                     str(root / 'tests/loader_probe.cpp'), str(source / 'src/LazyFile.cpp'),
                     *[str(source / 'src/loaders/elf' / name) for name in ['init.cpp', 'infos.cpp', 'elfnotes.cpp']],
                     '-Wl,--wrap=fopen,--wrap=fread,--wrap=fseek', '-o', str(binary)], check=True)

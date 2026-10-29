@@ -6,7 +6,7 @@ Ein klassischer Launcher für **HH3-Apps (`.hh3`)** auf dem Casio ClassPad II. M
 
 ## Installation
 
-[run.bin herunterladen](downloads/v0.5/run.bin) · [Komplettpaket](downloads/v0.5/hhk3-launcher-0.5-os7002.zip)
+[run.bin herunterladen](https://github.com/Loewenkrieger/Hollyhock-3-Custom-Launcher/releases/download/v0.5.0/run.bin) · [Komplettpaket](https://github.com/Loewenkrieger/Hollyhock-3-Custom-Launcher/releases/download/v0.5.0/hhk3-launcher-0.5-os7002.zip)
 
 1. Die bisherige `run.bin` sichern.
 2. Die neue `run.bin` und deine `.hh3`-Apps ins Hauptverzeichnis des Taschenrechner-Laufwerks kopieren.

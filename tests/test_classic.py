@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Exercise the exact UI controller/renderer; does not emulate the OS/hardware."""
 from pathlib import Path
+from sdk_path import sdk_include
 import argparse
 import subprocess
 import tempfile
@@ -26,12 +27,9 @@ with tempfile.TemporaryDirectory() as temporary:
     environment.setdefault('ASAN_OPTIONS', 'detect_leaks=0')
     subprocess.run(command, check=True, env=environment)
     adapter = Path(temporary) / 'classic-adapter'
-    sdk_include = root / 'sdk/include'
-    if not sdk_include.is_dir():
-        sdk_include = root / 'meta/hollyhock-3/sdk/include'
     subprocess.run(['g++', '-std=c++23', '-O1', '-g', '-Wall', '-Wextra', '-Werror', '-Wno-attributes',
                     '-fsanitize=address,undefined', '-fno-sanitize-recover=all',
-                    '-I' + str(root / 'src'), '-I' + str(sdk_include),
+                    '-I' + str(root / 'src'), '-I' + str(sdk_include(root)),
                     str(root / 'tests/classic_adapter.cpp'), str(root / 'src/gui.cpp'),
                     str(root / 'src/classic/ui.cpp'), '-o', str(adapter)], check=True)
     subprocess.run([str(adapter)], check=True, env=environment)

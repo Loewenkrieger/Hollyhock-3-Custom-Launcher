@@ -7,6 +7,7 @@ The optional target test interprets the actual SH caller and compiled callback.
 It is not an emulator for the complete Casio OS or calculator hardware.
 """
 from pathlib import Path
+from sdk_path import sdk_include
 import argparse
 import subprocess
 import tempfile
@@ -17,9 +18,7 @@ parser.add_argument('--target-elf', type=Path)
 parser.add_argument('--target-bin', type=Path)
 parser.add_argument('--nm', default='sh4a_nofpueb-elf-nm')
 args = parser.parse_args()
-sdk = root / 'sdk/include'
-if not sdk.is_dir():
-    sdk = root / 'meta/hollyhock-3/sdk/include'
+sdk = sdk_include(root)
 with tempfile.TemporaryDirectory() as temporary:
     binary = Path(temporary) / 'exit-probe'
     subprocess.run(['g++', '-std=c++23', '-O1', '-g', '-Wall', '-Wextra', '-Werror', '-Wno-attributes',

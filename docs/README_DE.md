@@ -5,7 +5,7 @@ Für den Casio ClassPad II mit bereits installiertem Hollyhock 3 auf **OS 02.01.
 ## Installation
 
 1. Die bisherige `run.bin` auf dem PC sichern.
-2. Die neue `run.bin` ins Hauptverzeichnis des Taschenrechner-Laufwerks kopieren und dort ersetzen. Sie liegt im Installationspaket ganz oben, im Repository unter `downloads/v0.5/`.
+2. Die neue `run.bin` ins Hauptverzeichnis des Taschenrechner-Laufwerks kopieren und dort ersetzen. Sie liegt im Installationspaket ganz oben oder einzeln bei den [Releases](https://github.com/Loewenkrieger/Hollyhock-3-Custom-Launcher/releases).
 3. Deine `.hh3`-Apps ebenfalls direkt ins Hauptverzeichnis kopieren. Zum Ausprobieren liegt im Installationspaket `smoke/launcher-test.hh3` bei.
 4. Das Laufwerk sicher auswerfen, USB trennen und den Launcher über das System-Menü öffnen.
 

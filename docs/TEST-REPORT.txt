@@ -8,7 +8,7 @@ Fresh big-endian SuperH build with the pinned GCC 15.2.0 toolchain.
 Hardware testing: NOT performed. Calculator startup timings and persistent
 MCS behavior still require verification on a real ClassPad.
 
-Automated checks: 76 passed
+Automated checks: 78 passed
 --------------------------
 21 UI controller/renderer checks, including touch capture, dragging,
    key repeat, scrolling, 25000 mixed events and framebuffer bounds.
@@ -31,6 +31,8 @@ Automated checks: 76 passed
  2 narrow target SH consumer checks against the freshly linked ELF and
    run.bin: the actual object/callback reaches the normal OS continuation;
    the null-result regression faults at the expected object dereference.
+ 2 target MCS ABI checks: SH compiler output returns 0x05000000 after a
+   synthetic byte write to the SDK enum, and 0x05 for the byte declaration.
 
 Host probes use AddressSanitizer and UndefinedBehaviorSanitizer, except
 for the exit-result probe, whose fixed ROM address overlaps ASan shadow
@@ -52,7 +54,7 @@ See PERFORMANCE.md for the measurement method.
 
 Build and distribution checks
 -----------------------------
-The bundled SDK, launcher and HH3 smoke app compile successfully.
+The pinned SDK submodule, launcher and HH3 smoke app compile successfully.
 ELF32, big-endian, EM_SH, entry 0x8cfd0000.
 App-code segment loading, cache maintenance and OS return behavior remain.
 The linked image stays below the reserved app RAM boundary at 0x8cff0000.
@@ -60,3 +62,5 @@ The existing closed/open/empty renderer previews are pixel-identical;
 the additional recent-app preview shows the recent-entry list styling.
 ZIP CRC, embedded source snapshot, local Markdown links, metadata hashes
 and inner/outer SHA256 manifests are checked before publication.
+Release packages include tests-host.json and tests-target.json with the
+actual outputs for their source inputs and target binary.

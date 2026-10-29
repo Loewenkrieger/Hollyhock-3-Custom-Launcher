@@ -10,7 +10,9 @@ METADIR = meta
 AS:=sh4a_nofpueb-elf-gcc
 AS_FLAGS:=-gdwarf-5
 
-SDK_DIR?=/sdk
+SDK_DIR?=meta/hollyhock-3/sdk
+SDK_PATH=$(if $(filter /%,$(SDK_DIR)),$(SDK_DIR),../../$(SDK_DIR))
+ADDRESSES_FILE=meta/hollyhock-3/versions/v02.01.7002.0001/addresses.json
 
 DEPFLAGS=-MT $@ -MMD -MP -MF $(DEPDIR)/$*.d
 WARNINGS=-Wall -Wextra -Wno-prio-ctor-dtor -pedantic -Werror -pedantic-errors
@@ -33,12 +35,11 @@ READELF:=sh4a_nofpueb-elf-readelf
 OBJCOPY:=sh4a_nofpueb-elf-objcopy
 STRIP:=sh4a_nofpueb-elf-strip
 
-PYTHON:=python3
+PYTHON?=python3
 
-ADDRESSES := $(shell find $(METADIR) -maxdepth 1 -name 'addresses.*.json')
-VERSIONS := $(ADDRESSES:$(METADIR)/addresses.%.json=%)
-OVERRIDES := $(foreach json, $(ADDRESSES), $(OUTDIR)/addresses.$(shell $(PYTHON) -c 'import json; print(json.load(open("$(json)"))["safeGuard"])').override)
-$(foreach json, $(ADDRESSES), $(eval $(OUTDIR)/addresses.$(shell $(PYTHON) -c 'import json; print(json.load(open("$(json)"))["safeGuard"])').override: $(BUILDDIR)/addresses.$(json:$(METADIR)/addresses.%.json=%).prep))
+VERSIONS := 7002
+OVERRIDES := $(OUTDIR)/addresses.2023.0209.1500.override
+$(OVERRIDES): $(BUILDDIR)/addresses.7002.prep
 
 APP_ELFS := $(VERSIONS:%=$(OUTDIR)/run.%.elf)
 APP_BINS := $(APP_ELFS:.elf=.bin)
@@ -61,12 +62,36 @@ elf: $(APP_ELFS) Makefile
 
 overrides: $(OVERRIDES) Makefile
 
-all: bin elf hh3 overrides
-.DEFAULT_GOAL := all
+all: launcher smoke
+.DEFAULT_GOAL := launcher
 .SECONDARY: # Prevents intermediate files from being deleted
 
+sdk:
+	@test -f "$(SDK_DIR)/Makefile" || { echo 'SDK missing: run git submodule update --init --recursive'; exit 1; }
+	$(MAKE) -C "$(SDK_DIR)"
+
+$(SDK_DIR)/libsdk.a:
+	$(MAKE) sdk
+
+launcher: sdk
+	$(MAKE) bin elf hh3 overrides
+
+smoke: sdk
+	$(MAKE) -C smoke/hh3 SDK_DIR="$(SDK_PATH)" APP_NAME=launcher-test
+
+test:
+	$(PYTHON) tools/run_tests.py host
+
+target-test: launcher
+	$(PYTHON) tools/run_tests.py target --outdir "$(OUTDIR)"
+
+package: launcher smoke
+	$(PYTHON) tools/package.py --outdir "$(OUTDIR)"
+
 clean:
-	rm -rf $(BUILDDIR) $(OUTDIR) $(DEPDIR)
+	rm -rf $(BUILDDIR) $(DEPDIR)
+	rm -f $(APP_BINS) $(APP_ELFS) $(APP_ELFS:%=%.map) $(APP_HH3S) $(OVERRIDES)
+	$(MAKE) -C smoke/hh3 SDK_DIR="$(SDK_PATH)" APP_NAME=launcher-test clean
 
 
 %.bin: %.elf
@@ -75,9 +100,9 @@ clean:
 %.hh3: %.elf
 	$(STRIP) -o $@ $^
 
-$(OUTDIR)/run.%.elf: $(OBJECTS) linker.ld $(BUILDDIR)/addresses.%.o
+$(OUTDIR)/run.%.elf: $(OBJECTS) linker.ld $(BUILDDIR)/addresses.%.o $(SDK_DIR)/libsdk.a
 	@mkdir -p $(dir $@)
-	$(LD) -T linker.ld -Wl,-Map $@.map -o $@ $(LD_FLAGS) $(filter-out linker.ld, $^) $(LIBS)
+	$(LD) -T linker.ld -Wl,-Map $@.map -o $@ $(LD_FLAGS) $(filter-out linker.ld $(SDK_DIR)/libsdk.a, $^) $(LIBS)
 
 $(BUILDDIR)/run.%.adjusted.elf: $(OUTDIR)/run.%.elf
 	@mkdir -p $(dir $@)
@@ -107,7 +132,7 @@ $(BUILDDIR)/%.o: %.cpp
 	@mkdir -p $(dir $(DEPDIR)/$<)
 	$(CXX) -c $< -o $@ $(CXX_FLAGS) $(DEPFLAGS)
 
-$(BUILDDIR)/addresses.%.prep: $(METADIR)/addresses.%.json convert_json.py
+$(BUILDDIR)/addresses.7002.prep: $(ADDRESSES_FILE) convert_json.py
 	@mkdir -p $(dir $@)
 	$(PYTHON) convert_json.py $< $@
 
@@ -120,6 +145,6 @@ compile_commands.json: clean
 	#sed -i 's/-m4a-nofpu//' compile_commands.json.tmp
 	mv compile_commands.json.tmp compile_commands.json
 
-.PHONY: bin elf hh3 overrides all clean compile_commands.json
+.PHONY: bin elf hh3 overrides all sdk launcher smoke test target-test package clean compile_commands.json
 
 -include $(DEPFILES)

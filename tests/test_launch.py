@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Exercise real launch orchestration and history with SDK-compatible stubs."""
 from pathlib import Path
+from sdk_path import sdk_include
 import os
 import subprocess
 import tempfile
@@ -8,7 +9,7 @@ import tempfile
 root = Path(__file__).resolve().parents[1]
 flags = ['g++', '-std=c++23', '-O1', '-g', '-Wall', '-Wextra', '-Werror',
          '-Wno-attributes', '-fsanitize=address,undefined', '-fno-sanitize-recover=all',
-         '-I' + str(root / 'src'), '-I' + str(root / 'sdk/include')]
+         '-I' + str(root / 'src'), '-I' + str(sdk_include(root))]
 with tempfile.TemporaryDirectory() as temporary:
     object_file = Path(temporary) / 'main.o'
     binary = Path(temporary) / 'launch-probe'

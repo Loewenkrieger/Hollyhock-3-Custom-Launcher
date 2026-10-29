@@ -1,0 +1,3 @@
+[submodule "meta/hollyhock-3"]
+	path = meta/hollyhock-3
+	url = https://github.com/ClasspadDev/hollyhock-3.git

@@ -2,6 +2,8 @@
 
 ## 0.5
 
+- SDK als festgesetztes Submodule; Build, Tests und Releasepakete über Make und GitHub Actions.
+- Downloads bei den Releases, mit vollständigem SDK-Quellcode im Komplettpaket.
 - Die fünf zuletzt gestarteten Apps stehen oben; die letzte App ist vorausgewählt.
 - Kleiner gespeicherter Verlauf im MCS, mit Rückfall auf die normale Auswahl bei Speicherfehlern.
 - Weniger Dateizugriffe beim Lesen der Programminfos, Detailtexte erst bei Auswahl kopieren.

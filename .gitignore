@@ -7,7 +7,6 @@ __pycache__/
 *.pyc
 *.o
 *.a
-/sdk/sdk.o
 /smoke/hh3/*.hh3
 /smoke/hh3/*.elf
 /smoke/hh3/obj/
