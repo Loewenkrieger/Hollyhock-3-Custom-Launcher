@@ -197,7 +197,7 @@ SECTIONS
   . = SEGMENT_START("ldata-segment", .);
   . = ALIGN(32 / 8);
   _end = .; PROVIDE (end = .);
-  ASSERT(_end <= 0x8CFF0000, "Dual launcher overlaps HHK2 application RAM")
+  ASSERT(_end <= 0x8CFF0000, "Launcher exceeds reserved RAM")
   . = DATA_SEGMENT_END (.);
 
   /* Stabs debugging sections.  */

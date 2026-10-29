@@ -1,9 +1,9 @@
 #include <appdef.h>
 #include <sdk/os/debug.h>
 #include <sdk/os/lcd.h>
-APP_NAME("Dual test: HH3")
+APP_NAME("Launcher test: HH3")
 APP_DESCRIPTION("Native HH3 SDK app. Displays a message and returns after a key press.")
-APP_AUTHOR("Dual Launcher test")
+APP_AUTHOR("Hollyhock 3 Custom Launcher")
 APP_VERSION("0.1")
 int main() {
   LCD_ClearScreen();

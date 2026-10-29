@@ -8,8 +8,6 @@ __pycache__/
 *.o
 *.a
 /sdk/sdk.o
-/hhk2-sdk/sdk.o
-/smoke/hhk2/*.hhk
 /smoke/hh3/*.hh3
 /smoke/hh3/*.elf
 /smoke/hh3/obj/

@@ -2,12 +2,9 @@
 #include <functional>
 #define _POSIX_C_SOURCE 200112L
 #include "addresses.h"
+#include "app_list.hpp"
 #include "gui.hpp"
 #include "impl.hpp"
-#include "loaders/binary/loader.hpp"
-#include "loaders/elf/loader.hpp"
-#include "loaders/legacy/loader.hpp"
-#include "loaders/interface.hpp"
 #include "strconv.hpp"
 #include <alloca.h>
 #include <cstddef>
@@ -87,15 +84,7 @@ int main() {
 
   std::unique_ptr<Executable> chosen;
   {
-    std::forward_list<std::unique_ptr<Executable>> list;
-    if (std::strcmp(reinterpret_cast<const char *>(addresses),
-                    "2017.0512.1515") == 0) // 2000 aka original hhk2
-      discover<BinaryLoader>::run(list);
-    discover<ELFLoader>::run(list);
-    discover<LegacyLoader>::run(list);
-    list.sort([](const auto &a, const auto &b) {
-      return std::strcmp(a->getPath().get(), b->getPath().get()) < 0;
-    });
+    auto list = discover_apps();
     chosen = do_gui(list);
   }
 

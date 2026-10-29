@@ -30,7 +30,6 @@ do_gui(std::forward_list<std::unique_ptr<Executable>> &executables) {
   for (auto &exe : executables) {
     classic::AppInfo app;
     app.path = text(exe->getPath());
-    app.format = app.path.ends_with(".hhk") ? "HHK2" : "HH3";
     try {
       app.name = text(exe->getName());
       app.version = text(exe->getVersion());

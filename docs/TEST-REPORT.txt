@@ -1,47 +1,57 @@
-Hollyhock Dual Launcher 0.4 - exit correction
+Hollyhock 3 Custom Launcher 0.5 Public - test report
 
-ROOT CAUSE
-Version 0.3 returned nullptr after a successful launcher/app exit.
-This hook replaces a dialog factory, not a void event callback.
-The original OS 02.01.7002.0001 System-menu handler at 0x8015C898
-immediately loads the returned object's vtable at +0x4C and calls its
-method entry at vtable+0x18C. A null result therefore reads address 0x4C.
-The old HHK2 main_bootstrap.cpp also documents the requirement to return
-a dialog object.
+Scope
+-----
+HH3-only public variant for installed Hollyhock 3 on OS 02.01.7002.0001.
+Hardware testing: NOT performed. No complete Casio OS emulation is claimed.
+The private 0.4 source and delivered files remain unchanged.
 
-FIX
-After the unchanged destructor, symbol-map and runtime cleanup, successful
-completion returns a static, trivial adapter for this narrow OS protocol.
-Its sole consumed method returns DialogResultCancel (0x03EB) without
-allocating, drawing, opening a window, touching hardware or requesting reset.
-The native caller then branches to its normal continuation at 0x8015CF94
-without committing a change to the Imaginary Unit system setting.
-The object and callback remain valid after C/C++ runtime finalization.
-No Casio heap object is allocated or leaked for this normal return.
+Retained behavior
+-----------------
+The HH3 ELF loader is byte-for-byte identical to the private 0.4 source.
+The input controller is unchanged. UI differences are limited to HH3-only
+metadata, the empty-list instructions and the displayed version.
+setup.cpp, exit_protocol.hpp/.cpp and exit_result.cpp are unchanged.
+The checked return adapter returns Cancel (0x03eb) to the OS 7002 caller at
+0x8015c898 and resumes the normal path at 0x8015cf94. A different caller
+signature retains the native completion dialog; errors remain explicit.
 
-The OS guard and 32-byte caller instruction fingerprint plus its settings
-result constant are checked before using the adapter. Unknown caller/OS
-versions retain the original native completion-dialog return path.
-Nonzero application exits retain an explicit error-code dialog.
-Close, title X and physical Clear all use the same successful exit path.
+Removed components
+------------------
+HHK2 ELF loader/parser, old SDK, SDK-address translation, raw binary app
+loader, OS 2000 configuration, legacy tests and legacy smoke app.
+The public package contains no older dual-launcher/fallback binaries.
 
-VALIDATION
-PASS: target SuperH big-endian ELF, entry 0x8CFD0000.
-PASS: raw image length equals linked memory range, below 128 KiB.
-PASS: launcher/app RAM separation; linker assertion passes.
-PASS: UI/adapter tests with AddressSanitizer and UBSan; leak checking disabled
-      because the hosted environment cannot inspect /proc threads.
-PASS: exit-result factory tests use UBSan. They map the actual OS probe address
-      in a host process; this address overlaps ASan's shadow region on x86-64.
-PASS: target-consumer test interprets the actual 32-byte OS consumer sequence
-      and the callback instructions from the delivered SH image. New result
-      reaches normal continuation; the old null result faults at +0x4C.
-PASS: no writes or native GUI calls in the successful adapter method.
-PASS: GUI controller/input adapter and both app loading implementations are
-      unchanged from 0.3; only the displayed UI version changed to 0.4.
-PASS: source whitespace check.
+Automated checks: 36 passed
+---------------------------
+UI: 21 controller/renderer checks and 4 real gui.cpp adapter checks, using
+ASan and UBSan. LeakSanitizer is disabled because hosted environments may
+block its inspection of /proc threads.
+Discovery: 3 checks against production app_list.cpp and the actual file
+search template; OS enumeration is mocked and ELF execution is replaced
+by assertion stubs. Checks cover mixed formats, unsupported-only files,
+sorting, hidden files and directories. No app is loaded or executed.
+Exit: 6 tests of the actual exit-result factory and native fallback under
+UBSan. The real-address ROM probe conflicts with ASan shadow memory.
+Target: 2 narrow SH instruction-consumer checks use the actual return
+object and callback from the linked target image. They reach the normal
+OS continuation; the old null-return regression faults at address 0x4c.
+This limited interpreter does not simulate the rest of the calculator.
 
-UI tests:
+Build and distribution checks
+-----------------------------
+SuperH big-endian ELF32; machine EM_SH; entry 0x8cfd0000.
+The image remains within the reserved launcher RAM.
+No LegacyLoader/BinaryLoader/address-map symbols remain in the linked ELF.
+The bundled HH3 SDK and HH3 smoke app build with the pinned toolchain.
+The archives are checked for CRC, matching binary hashes and absence of
+removed loader/SDK sources, previous releases and firmware/updater files.
+Renderer previews are generated by the production renderer on the host.
+
+Individual check output
+-----------------------
+
+UI and real GUI adapter
 PASS empty list cannot start; Close remains active
 PASS dropdown selects tapped row
 PASS selector toggles dropdown
@@ -64,13 +74,19 @@ PASS renderer respects framebuffer boundaries with open dropdown
 PASS long text, UTF-8, malformed text and clipped canvas remain bounded
 PASS 25000 mixed input events preserve selection and scroll bounds
 21/21 checks passed
-PASS real adapter: short dropdown/Run taps with invalid lift coordinates choose HHK2 entry
+PASS real adapter: short dropdown/Run taps with invalid lift coordinates choose second HH3 entry
 PASS real adapter: released EXE ignored; Down + EXE selects intended app
 PASS real adapter: idle events do not redraw or swallow the following tap
 PASS real adapter: drag cancellation followed by physical Clear exits
 4/4 adapter checks passed
 
-Exit protocol / delivered target image:
+HH3 discovery
+PASS discovery: mixed directory lists and sorts only HH3 apps
+PASS discovery: only unsupported files yields an empty app list
+PASS discovery: directories and hidden entries are excluded
+3/3 discovery checks passed (mock file system; no app execution)
+
+Exit and target SH consumer
 PASS matched OS 7002 returns a non-null result consumed as Cancel, without a dialog
 PASS each of 32 mismatching caller bytes falls back to the native completion path
 PASS unexpected settings-result constant disables the silent return
@@ -81,40 +97,3 @@ PASS nonzero exits retain an explicit error dialog and avoid the silent return
 PASS target SH image: actual return object/callback reaches normal OS continuation with Cancel
 PASS regression: old null return faults at OS object dereference +0x4c
 2/2 target-consumer checks passed (narrow SH interpreter; not a hardware test)
-
-Legacy parser:
-test_absent_symbol_table (__main__.ParserTests.test_absent_symbol_table) ... ok
-test_bitmask_is_not_treated_as_rom (__main__.ParserTests.test_bitmask_is_not_treated_as_rom) ... ok
-test_entry_alignment (__main__.ParserTests.test_entry_alignment) ... ok
-test_entry_not_in_code (__main__.ParserTests.test_entry_not_in_code) ... ok
-test_generated_maps_have_no_missing_or_duplicate_entries (__main__.ParserTests.test_generated_maps_have_no_missing_or_duplicate_entries) ... ok
-test_header_endian (__main__.ParserTests.test_header_endian) ... ok
-test_header_offset_overflow (__main__.ParserTests.test_header_offset_overflow) ... ok
-test_loader_overlap (__main__.ParserTests.test_loader_overlap) ... ok
-test_os2000_keeps_original_addresses (__main__.ParserTests.test_os2000_keeps_original_addresses) ... ok
-test_overlapping_sections (__main__.ParserTests.test_overlapping_sections) ... ok
-test_processor (__main__.ParserTests.test_processor) ... ok
-test_section_overflow (__main__.ParserTests.test_section_overflow) ... ok
-test_translates_only_referenced_literals_and_data (__main__.ParserTests.test_translates_only_referenced_literals_and_data) ... ok
-test_truncation (__main__.ParserTests.test_truncation) ... ok
-test_unknown_absolute_symbol (__main__.ParserTests.test_unknown_absolute_symbol) ... ok
-test_unknown_rom_literal (__main__.ParserTests.test_unknown_rom_literal) ... ok
-test_unterminated_metadata (__main__.ParserTests.test_unterminated_metadata) ... ok
-
-----------------------------------------------------------------------
-Ran 17 tests in 4.397s
-
-OK
-
-PASS: packaged source and delivered debug ELF/raw binary pass the same eight
-exit tests with the packaged SDK header layout.
-
-LIMITS
-NOT TESTED: execution on a physical calculator, full Casio OS execution,
-physical display/input/cleanup timing, app execution/return on hardware.
-The narrow instruction interpreter is not a complete SH or Casio emulator.
-A successful hardware test of Close, X, Clear, reopening the launcher and
-returning from both app formats remains outstanding.
-The target contract was derived from the original image with SHA256:
-62c95f96df2c238282a4b208b9a970dbfbfd53c4aa70b938ae5cbb9c4cd06973
-No firmware image or firmware updater is included in this package.

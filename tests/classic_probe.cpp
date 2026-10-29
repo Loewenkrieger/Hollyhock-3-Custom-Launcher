@@ -16,8 +16,8 @@ static std::vector<AppInfo> sample(int count) {
   std::vector<AppInfo> apps;
   for (int i = 0; i < count; ++i)
     apps.push_back({i == 0 ? "Tetris" : "Application " + std::to_string(i + 1),
-                    i == 0 ? "\\fls0\\tetris.hhk" : "\\fls0\\app.hh3", "1.0.0", "De_Coder",
-                    "A simple implementation of the game Tetris.", i == 0 ? "HHK2" : "HH3"});
+                    i == 0 ? "\\fls0\\tetris.hh3" : "\\fls0\\app.hh3", "1.0.0", "De_Coder",
+                    "A simple implementation of the game Tetris."});
   return apps;
 }
 static void ppm(const std::string &path, const State &s, const std::vector<AppInfo> &apps) {

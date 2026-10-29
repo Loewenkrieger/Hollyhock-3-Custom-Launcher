@@ -1,0 +1,59 @@
+{
+  "name": "Hollyhock 3 Custom Launcher - Public",
+  "version": "0.5",
+  "variant": "public",
+  "target_os": "02.01.7002.0001",
+  "formats": [
+    "HH3 ELF (.hh3)"
+  ],
+  "hardware_tested": false,
+  "firmware_update_required": false,
+  "windows_flasher_included": false,
+  "upstream": {
+    "yal_commit": "a7bc33dc1c4c0779fd400eb1394145dd705076b5",
+    "hhk3_sdk_commit": "1e483e395391d50d9bd2d21cee4beecc7589fb1c"
+  },
+  "toolchain_image": "ghcr.io/classpaddev/hollyhock-3@sha256:4381a460f8b19411552ac30f2aba73da38d3aba535412a66c69f8528fe94b49a",
+  "compiler": "sh4a_nofpueb-elf-g++ GCC 15.2.0",
+  "launcher_link_range": [
+    "0x8cfd0000",
+    "0x8cfe2948"
+  ],
+  "run_bin_size": 76104,
+  "run_bin_sha256": "e3b15f6b9dcb9ab3f3782a643c7f09a12db5b954edffd379034391b2ad1be4ea",
+  "smoke_hh3_sha256": "3dd3b34dfaf9c61a3c40bff0421bb5f80a082a55c84644165134aeef5f466224",
+  "frontend": "Classic framebuffer UI; direct GetInput event loop; HH3 only",
+  "tests": {
+    "ui_controller_renderer": 21,
+    "real_gui_adapter_with_mock_sdk": 4,
+    "hh3_only_discovery": 3,
+    "exit_result_factory": 6,
+    "target_sh_consumer": 2
+  },
+  "font": {
+    "family": "DejaVu Sans",
+    "size_px": 16,
+    "subset": "ASCII and Latin-1"
+  },
+  "exit_contract": {
+    "os_guard": "2023.0209.1500",
+    "caller": "0x8015c898",
+    "normal_continuation": "0x8015cf94",
+    "object_vtable_offset": "0x4c",
+    "finish_slot": "0x18c",
+    "cancel_result": "0x03eb",
+    "source_image_sha256": "62c95f96df2c238282a4b208b9a970dbfbfd53c4aa70b938ae5cbb9c4cd06973"
+  },
+  "changes": [
+    "Separate public source tree and distribution",
+    "HH3 discovery only; legacy and binary loaders removed",
+    "HHK2 SDK, address maps, legacy parser/tests/smoke app and OS 2000 metadata removed",
+    "Classic input handling and guarded OS return from private 0.4 retained",
+    "Footer and empty-list instructions updated for 0.5 Public"
+  ],
+  "build_validation": {
+    "bundled_sdk_build": true,
+    "bundled_sdk_binary_matches_toolchain_sdk": true,
+    "test_total": 36
+  }
+}

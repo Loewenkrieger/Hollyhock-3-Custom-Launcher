@@ -40,7 +40,7 @@ struct FakeApp final : Executable {
   void load() override { assert(false); }
   void unload() override { assert(false); }
   int execute() override { assert(false); return 0; }
-  std::unique_ptr<char[]> getPath() override { return copy(id == 0 ? "\\fls0\\one.hh3" : "\\fls0\\two.hhk"); }
+  std::unique_ptr<char[]> getPath() override { return copy(id == 0 ? "\\fls0\\one.hh3" : "\\fls0\\two.hh3"); }
   std::unique_ptr<char[]> getName() override { return copy(id == 0 ? "One" : "Two"); }
 };
 std::forward_list<std::unique_ptr<Executable>> apps() {
@@ -63,7 +63,7 @@ int main() {
       touch(TOUCH_DOWN, 50, 74 + 28 + 10), touch(TOUCH_UP, -500, -500),
       touch(TOUCH_DOWN, 50, 95), touch(TOUCH_UP, 0, 0)});
     auto chosen = do_gui(list); assert(chosen && static_cast<FakeApp *>(chosen.get())->id == 1 && position == 6);
-    std::cout << "PASS real adapter: short dropdown/Run taps with invalid lift coordinates choose HHK2 entry\n"; }
+    std::cout << "PASS real adapter: short dropdown/Run taps with invalid lift coordinates choose second HH3 entry\n"; }
   { auto list = apps(); reset({key(KEYCODE_EXE, KEY_RELEASED), key(KEYCODE_DOWN), key(KEYCODE_EXE)});
     auto chosen = do_gui(list); assert(chosen && static_cast<FakeApp *>(chosen.get())->id == 1 && position == 3);
     std::cout << "PASS real adapter: released EXE ignored; Down + EXE selects intended app\n"; }

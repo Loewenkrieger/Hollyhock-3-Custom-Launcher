@@ -33,7 +33,7 @@ READELF:=sh4a_nofpueb-elf-readelf
 OBJCOPY:=sh4a_nofpueb-elf-objcopy
 STRIP:=sh4a_nofpueb-elf-strip
 
-PYTHON:=python
+PYTHON:=python3
 
 ADDRESSES := $(shell find $(METADIR) -maxdepth 1 -name 'addresses.*.json')
 VERSIONS := $(ADDRESSES:$(METADIR)/addresses.%.json=%)
@@ -42,11 +42,11 @@ $(foreach json, $(ADDRESSES), $(eval $(OUTDIR)/addresses.$(shell $(PYTHON) -c 'i
 
 APP_ELFS := $(VERSIONS:%=$(OUTDIR)/run.%.elf)
 APP_BINS := $(APP_ELFS:.elf=.bin)
-APP_HHKS := $(APP_ELFS:.elf=.adjusted.hh3)
+APP_HH3S := $(APP_ELFS:.elf=.adjusted.hh3)
 
 AS_SOURCES:=$(shell find $(SOURCEDIR) -name '*.S' -not -name '*.template.*')
 CC_SOURCES:=$(shell find $(SOURCEDIR) -name '*.c' -not -name '*.template.*')
-CXX_SOURCES:=$(filter-out $(SOURCEDIR)/native/%, $(shell find $(SOURCEDIR) -name '*.cpp' -not -name '*.template.*'))
+CXX_SOURCES:=$(shell find $(SOURCEDIR) -name '*.cpp' -not -name '*.template.*')
 OBJECTS := $(addprefix $(BUILDDIR)/,$(AS_SOURCES:.S=.o)) \
 	$(addprefix $(BUILDDIR)/,$(CC_SOURCES:.c=.o)) \
 	$(addprefix $(BUILDDIR)/,$(CXX_SOURCES:.cpp=.o))
@@ -56,12 +56,12 @@ NOLTOOBJS := $(foreach obj, $(OBJECTS), $(if $(findstring /nolto/, $(obj)), $(ob
 DEPFILES := $(OBJECTS:$(BUILDDIR)/%.o=$(DEPDIR)/%.d)
 
 bin: $(APP_BINS) Makefile
-hhk: $(APP_HHKS) Makefile
+hh3: $(APP_HH3S) Makefile
 elf: $(APP_ELFS) Makefile
 
 overrides: $(OVERRIDES) Makefile
 
-all: bin elf hhk overrides
+all: bin elf hh3 overrides
 .DEFAULT_GOAL := all
 .SECONDARY: # Prevents intermediate files from being deleted
 
@@ -120,6 +120,6 @@ compile_commands.json: clean
 	#sed -i 's/-m4a-nofpu//' compile_commands.json.tmp
 	mv compile_commands.json.tmp compile_commands.json
 
-.PHONY: bin elf hhk overrides all clean compile_commands.json
+.PHONY: bin elf hh3 overrides all clean compile_commands.json
 
 -include $(DEPFILES)

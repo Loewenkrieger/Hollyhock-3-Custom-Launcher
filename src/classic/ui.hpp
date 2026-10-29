@@ -13,7 +13,7 @@ struct Rect {
 };
 
 struct AppInfo {
-  std::string name, path, version, author, description, format;
+  std::string name, path, version, author, description;
 };
 
 enum class Key { Up, Down, Left, Right, Enter, Escape };

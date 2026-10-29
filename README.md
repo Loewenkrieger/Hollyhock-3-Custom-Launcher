@@ -1,52 +1,63 @@
-# Hollyhock 3 Custom Launcher
+# Hollyhock 3 Custom Launcher — Public
 
-Custom Launcher fuer den Casio ClassPad II: **HHK2-Ansicht und Bedienung auf HHK3**, mit `.hh3`- und experimenteller `.hhk`-Unterstuetzung.
+Klassischer Launcher für den **Casio ClassPad II**, mit der Oberfläche im HHK2-Stil und ausschließlich **HH3-Apps (`.hh3`)**.
 
-Aktueller Stand: **0.4**, fuer bereits installiertes HHK3 auf **OS 02.01.7002.0001**.
+Version **0.5 Public**, für bereits installiertes Hollyhock 3 auf **OS 02.01.7002.0001**.
 
 ## Download und Installation
 
-- [Komplettes Paket 0.4](downloads/v0.4/hhk-dual-launcher-0.4-classic-exit-fix-os7002.zip)
-- [run.bin](downloads/v0.4/run.bin)
+- [Installationspaket 0.5](downloads/v0.5/hhk3-public-launcher-0.5-os7002.zip)
+- [run.bin](downloads/v0.5/run.bin)
 - [Deutsche Anleitung](docs/README_DE.md)
-- [Pruefbericht und Grenzen](docs/TEST-REPORT.txt)
+- [Prüfbericht](docs/TEST-REPORT.txt)
 
-Die vorhandene `run.bin` sichern und die neue Datei ins Hauptverzeichnis des Taschenrechner-Laufwerks kopieren. Sicher auswerfen, USB trennen und den Launcher wie bisher oeffnen. **Kein Firmwareupdate erforderlich.**
+Die vorhandene `run.bin` sichern und die neue Datei ins Hauptverzeichnis des Taschenrechner-Laufwerks kopieren. Apps ebenfalls direkt dort als `.hh3` ablegen. Sicher auswerfen, USB trennen und den Launcher wie bisher öffnen. **Kein Firmwareupdate erforderlich.**
 
 ## Funktionen
 
-- HHK2-Layout mit Dropdown, Run, Close und Programminformationen.
-- Direkte Touch-Ereignisverarbeitung und physische Pfeil-, EXE- und Clear-Tasten.
-- HH3-ELF-Lader und konservative HHK2-SDK-Adressuebersetzung.
-- Korrektur des Beendens in 0.4: gueltiger Rueckgabeadapter fuer den geprueften OS-7002-Aufrufer, ohne Abschlussfenster. Bei anderer Aufrufstelle bleibt der native Abschlussdialog erhalten.
+- Klassische Oberfläche mit Dropdown, Run, Close und Programminformationen.
+- Direkte Touch-Ereignisverarbeitung sowie Pfeil-, EXE- und Clear-Tasten.
+- HH3-ELF-Loader; `.hhk`- und alte `.bin`-Apps erscheinen nicht in der Auswahl.
+- Rückkehr zur vorherigen Casio-Ansicht beim normalen Beenden über den geprüften OS-7002-Aufrufer. Bei verändertem Aufrufer bleibt der native Abschlussdialog erhalten.
 
-![HHK2-Ansicht](docs/preview/classic-closed.png)
+![Vorschau des Renderers](docs/preview/classic-closed.png)
 
-## Pruefstand
+## Varianten
 
-50 automatisierte Pruefungen bestehen: 25 fuer UI/Eingaben, 17 fuer den HHK2-Parser und 8 fuer den OS-Rueckgabeweg einschliesslich einer eng begrenzten SuperH-Instruktionssimulation. **Version 0.4 ist noch nicht am echten Taschenrechner getestet.** Die HHK2-Kompatibilitaet ist experimentell und keine vollstaendige Emulation des alten OS.
+Die **Public-Version 0.5** enthält ausschließlich den HH3-Loader. HHK2-Loader, altes SDK, Adressübersetzung, alte Test-Apps und frühere Dual-Binärdateien gehören nicht zu diesem Repository oder den Downloadpaketen.
+
+Die bisherige **Private-Version 0.4** mit HH3- und experimenteller HHK2-Unterstützung wird separat aufbewahrt. Das bestehende private Repository bleibt privat. [Details zur Trennung](docs/VARIANTS.md).
+
+## Prüfstand
+
+**36 automatisierte Prüfungen bestehen:** 25 für Oberfläche/Eingaben, 3 für die HH3-App-Suche und 8 für den Rückgabeweg einschließlich einer eng begrenzten SuperH-Instruktionssimulation. Der SuperH-Build und die mitgelieferte HH3-Test-App lassen sich kompilieren.
+
+**Version 0.5 wurde hier nicht am echten Taschenrechner getestet.** Die Tests führen keine gestarteten Apps auf Calculator-Hardware aus. Die Vorschauen stammen vom PC-Renderer.
 
 ## Entwicklung
 
-Quellcode liegt direkt unter `src/`. Die SDK-Quellen sind unter `sdk/` und `hhk2-sdk/` enthalten. Der Build verwendet die mitgelieferte Bitmap-Schrift; uGFX wird nicht benoetigt.
+Quellcode liegt unter `src/`, das HH3-SDK unter `sdk/`. Der normale Build verwendet die mitgelieferte Bitmap-Schrift.
 
-Hosttests mit Python 3 und g++ mit C++23:
+Hosttests benötigen Python 3 und g++ mit C++23:
 
 ```sh
 python3 tests/test_classic.py
-python3 tests/test_legacy.py
+python3 tests/test_discovery.py
 python3 tests/test_exit.py
 ```
 
-Calculator-Build: `sh4a_nofpueb-elf-g++` 15.2.0 im PATH, `SDK_DIR` auf das gebaute HHK3-SDK setzen, dann:
+Calculator-Build: `sh4a_nofpueb-elf-g++` 15.2.0 im PATH, `SDK_DIR` auf das gebaute HH3-SDK setzen:
 
 ```sh
 sh build.sh
+sh build-smoke.sh
 ```
 
-Ergebnis: `dist/run.7002.bin`. Zum Verwenden in `run.bin` umbenennen. Das Toolchain-Image und die genauen Quellrevisionen stehen in [BUILD.json](downloads/v0.4/BUILD.json).
+Ergebnisse: `dist/run.7002.bin` und `smoke/hh3/launcher-test.hh3`. Für den Taschenrechner die Launcher-Datei in `run.bin` umbenennen. Das genaue Toolchain-Image und die Quellrevisionen stehen in [BUILD.json](downloads/v0.5/BUILD.json).
 
-Optionale Pruefung des kompilierten Rueckgabeadapters:
+Das enthaltene SDK kann mit derselben Toolchain über `make -C sdk` gebaut werden; anschließend `SDK_DIR` auf den absoluten Pfad dieses Ordners setzen.
+
+Prüfung des kompilierten Rückgabeadapters:
 
 ```sh
 python3 tests/test_exit.py --target-elf dist/run.7002.elf --target-bin dist/run.7002.bin
@@ -54,6 +65,6 @@ python3 tests/test_exit.py --target-elf dist/run.7002.elf --target-bin dist/run.
 
 ## Grundlagen und Lizenz
 
-Basierend auf [ClasspadDev/yal](https://github.com/ClasspadDev/yal), dem [HHK3-SDK](https://github.com/ClasspadDev/hollyhock-3) und dem [HHK2-SDK](https://github.com/SnailMath/hollyhock-2). Urspruengliche Hinweise und Quellrevisionen bleiben erhalten.
+Basierend auf [ClasspadDev/yal](https://github.com/ClasspadDev/yal) und dem [Hollyhock-3-SDK](https://github.com/ClasspadDev/hollyhock-3). Ursprüngliche Hinweise und Quellrevisionen bleiben erhalten.
 
-Code: [GPL-3.0](LICENSE). Fuer DejaVu Sans gilt die beiliegende [Schriftlizenz](src/classic/FONT-LICENSE.txt). Dieses Repository enthaelt keine Casio-Firmware und keinen Firmware-Updater.
+Code: [GPL-3.0](LICENSE). Für DejaVu Sans gilt die beiliegende [Schriftlizenz](src/classic/FONT-LICENSE.txt). Dieses Repository enthält keine Casio-Firmware und keinen Firmware-Updater.
