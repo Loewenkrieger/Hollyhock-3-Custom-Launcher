@@ -18,6 +18,8 @@ Ein Firmwareupdate ist dafür nicht nötig.
 
 App im Dropdown auswählen und mit **Run** starten. **Close**, **X** oder **Clear** schließen den Launcher. Mit den Pfeiltasten und **EXE** geht es auch ohne Touch.
 
+Die fünf zuletzt gestarteten Apps stehen mit einem **\*** oben in der Liste. Die letzte App ist direkt ausgewählt – zum erneuten Starten genügt **EXE**. Der Verlauf bleibt beim nächsten Öffnen erhalten.
+
 ![Vorschau der Oberfläche](docs/preview/classic-closed.png)
 
 Die Version wurde automatisiert geprüft; der abschließende Test am echten ClassPad steht noch aus.

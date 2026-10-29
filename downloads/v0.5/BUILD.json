@@ -16,16 +16,19 @@
   "compiler": "sh4a_nofpueb-elf-g++ GCC 15.2.0",
   "launcher_link_range": [
     "0x8cfd0000",
-    "0x8cfe2948"
+    "0x8cfe36d8"
   ],
-  "run_bin_size": 76104,
-  "run_bin_sha256": "e3b15f6b9dcb9ab3f3782a643c7f09a12db5b954edffd379034391b2ad1be4ea",
+  "run_bin_size": 79576,
+  "run_bin_sha256": "c8474791ef0d03abfba0c39e56681562390d08d7022fe3da9a34d8f26b2289b4",
   "smoke_hh3_sha256": "3dd3b34dfaf9c61a3c40bff0421bb5f80a082a55c84644165134aeef5f466224",
-  "frontend": "Classic framebuffer UI; direct GetInput event loop; HH3 only",
+  "frontend": "Classic framebuffer UI; direct GetInput event loop; HH3 apps and five recent entries",
   "tests": {
     "ui_controller_renderer": 21,
-    "real_gui_adapter_with_mock_sdk": 4,
-    "hh3_only_discovery": 3,
+    "real_gui_adapter_with_mock_sdk": 7,
+    "hh3_only_discovery": 4,
+    "elf_metadata": 17,
+    "mcs_history": 14,
+    "launch_integration": 5,
     "exit_result_factory": 6,
     "target_sh_consumer": 2
   },
@@ -44,21 +47,44 @@
     "source_image_sha256": "62c95f96df2c238282a4b208b9a970dbfbfd53c4aa70b938ae5cbb9c4cd06973"
   },
   "changes": [
-    "Classic dropdown interface with direct touch and key input",
-    "HH3 app discovery and ELF loading",
-    "Guarded return to Casio OS 02.01.7002.0001",
-    "Source tree, documentation and installation package cleanup"
+    "Five recently launched apps first, with the last app preselected",
+    "Bounded MCS history; browsing and closing perform no writes",
+    "Sort paths without temporary copies; reserve menu storage once",
+    "Copy detail text only when selected and cache it for revisits",
+    "Read ELF note segments in one operation and retain borrowed note views",
+    "Preserve classic controls, app-code loading and guarded OS return"
   ],
   "build_validation": {
     "bundled_sdk_build": true,
-    "bundled_sdk_binary_matches_toolchain_sdk": true,
-    "test_total": 36
+    "smoke_app_build": true,
+    "pinned_toolchain_used": true,
+    "test_total": 76
   },
-  "repository_cleanup_validation": {
+  "history": {
+    "backend": "MCS",
+    "folder": "hhlaunch",
+    "variable": "recent",
+    "capacity": 5,
+    "max_record_bytes": 512,
+    "write_policy": "after successful app load, before execution"
+  },
+  "optimization_validation": {
     "date": "2026-10-29",
-    "host_checks_passed": 34,
-    "distributed_target_consumer_checks_passed": 2,
-    "run_bin_unchanged": true,
-    "fresh_calculator_build": false
+    "baseline_source_commit": "11ebaaab52b13bf3566850580777756574d27ed6",
+    "metadata_fixture": {
+      "before": {
+        "fopen": 1,
+        "fread": 14,
+        "fseek": 11
+      },
+      "after": {
+        "fopen": 1,
+        "fread": 3,
+        "fseek": 4
+      }
+    },
+    "menu_app_count": 1000,
+    "initial_app_detail_queries": 3,
+    "calculator_timings_measured": false
   }
 }

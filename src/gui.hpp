@@ -5,4 +5,5 @@
 #include <memory>
 
 std::unique_ptr<Executable>
-do_gui(std::forward_list<std::unique_ptr<Executable>> &executable_list);
+do_gui(std::forward_list<std::unique_ptr<Executable>> &executable_list,
+       std::size_t recent_count = 0);

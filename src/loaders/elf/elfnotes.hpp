@@ -8,17 +8,14 @@
 
 class ELFNotes {
 public:
-  ELFNotes(std::unique_ptr<const char[]> name,
-           std::unique_ptr<const std::uint8_t[]> desc, std::size_t size_name,
-           std::size_t size_desc, Elf32_Word type);
+  ELFNotes(std::span<const char> name, std::span<const std::uint8_t> desc,
+           Elf32_Word type);
 
   [[nodiscard]] std::span<const char> getName() const;
   [[nodiscard]] std::span<const std::uint8_t> getDesc() const;
   const Elf32_Word type;
 
 private:
-  std::unique_ptr<const char[]> data_name;
-  std::unique_ptr<const std::uint8_t[]> data_desc;
-  std::size_t size_name;
-  std::size_t size_desc;
+  std::span<const char> data_name;
+  std::span<const std::uint8_t> data_desc;
 };

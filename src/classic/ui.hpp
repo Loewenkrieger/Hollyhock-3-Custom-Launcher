@@ -14,6 +14,7 @@ struct Rect {
 
 struct AppInfo {
   std::string name, path, version, author, description;
+  bool recent = false;
 };
 
 enum class Key { Up, Down, Left, Right, Enter, Escape };

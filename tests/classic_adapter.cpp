@@ -4,6 +4,7 @@
 #include "gui.hpp"
 #include <sdk/os/input.h>
 #include <cassert>
+#include <array>
 #include <cstring>
 #include <iostream>
 #include <stdexcept>
@@ -13,6 +14,8 @@ namespace {
 std::vector<Input_Event> events;
 std::size_t position;
 int refreshes;
+int name_reads;
+std::array<int, 1000> detail_reads{};
 std::uint16_t pixels[320 * 528];
 void size(unsigned *w, unsigned *h) { *w = 320; *h = 528; }
 std::uint16_t *framebuffer() { return pixels; }
@@ -36,19 +39,26 @@ std::unique_ptr<char[]> copy(const char *s) {
 }
 struct FakeApp final : Executable {
   int id;
-  explicit FakeApp(int number) : id(number) {}
+  std::string file_path;
+  explicit FakeApp(int number) : id(number), file_path(number == 0 ? "\\fls0\\one.hh3" : number == 1 ? "\\fls0\\two.hh3" : "\\fls0\\app" + std::to_string(number) + ".hh3") {}
   void load() override { assert(false); }
   void unload() override { assert(false); }
   int execute() override { assert(false); return 0; }
-  std::unique_ptr<char[]> getPath() override { return copy(id == 0 ? "\\fls0\\one.hh3" : "\\fls0\\two.hh3"); }
-  std::unique_ptr<char[]> getName() override { return copy(id == 0 ? "One" : "Two"); }
+  std::string_view pathView() const override { return file_path; }
+  std::unique_ptr<char[]> getName() override { ++name_reads; return copy(id == 0 ? "One" : id == 1 ? "Two" : file_path.c_str()); }
+  std::unique_ptr<char[]> getVersion() override { ++detail_reads[id]; return copy("1.0"); }
+  std::unique_ptr<char[]> getAuthor() override { ++detail_reads[id]; return copy("Author"); }
+  std::unique_ptr<char[]> getDescription() override { ++detail_reads[id]; return copy("Description"); }
 };
-std::forward_list<std::unique_ptr<Executable>> apps() {
+std::forward_list<std::unique_ptr<Executable>> apps(int count = 2) {
   std::forward_list<std::unique_ptr<Executable>> out;
-  auto tail = out.emplace_after(out.before_begin(), std::make_unique<FakeApp>(0));
-  out.emplace_after(tail, std::make_unique<FakeApp>(1)); return out;
+  auto tail = out.before_begin();
+  for (int i = 0; i < count; ++i) tail = out.emplace_after(tail, std::make_unique<FakeApp>(i));
+  return out;
 }
-void reset(std::vector<Input_Event> queue) { events = std::move(queue); position = 0; refreshes = 0; }
+void reset(std::vector<Input_Event> queue) {
+  events = std::move(queue); position = 0; refreshes = name_reads = 0; detail_reads.fill(0);
+}
 }
 
 extern "C" {
@@ -75,5 +85,19 @@ int main() {
       touch(TOUCH_UP, 50, 95), key(KEYCODE_POWER_CLEAR)});
     assert(!do_gui(list)); assert(position == 4);
     std::cout << "PASS real adapter: drag cancellation followed by physical Clear exits\n"; }
-  std::cout << "4/4 adapter checks passed\n";
+  { auto list = apps(1000); reset({key(KEYCODE_POWER_CLEAR)});
+    assert(!do_gui(list));
+    assert(name_reads == 1000 && detail_reads[0] == 3);
+    assert(std::all_of(detail_reads.begin() + 1, detail_reads.end(), [](int n) { return n == 0; }));
+    std::cout << "PASS real adapter: 1000 app names remain available; startup copies details for only one app\n"; }
+  { auto list = apps(); reset({key(KEYCODE_DOWN), key(KEYCODE_UP), key(KEYCODE_DOWN), key(KEYCODE_EXE)});
+    const auto chosen = do_gui(list);
+    assert(chosen && static_cast<FakeApp *>(chosen.get())->id == 1);
+    assert(detail_reads[0] == 3 && detail_reads[1] == 3);
+    std::cout << "PASS real adapter: revisiting a selection reuses its cached detail strings\n"; }
+  { auto list = apps(); list.reverse(); reset({key(KEYCODE_EXE)});
+    const auto chosen = do_gui(list, 1);
+    assert(chosen && static_cast<FakeApp *>(chosen.get())->id == 1 && position == 1);
+    std::cout << "PASS real adapter: EXE launches the preselected recent entry with correct executable mapping\n"; }
+  std::cout << "7/7 adapter checks passed\n";
 }

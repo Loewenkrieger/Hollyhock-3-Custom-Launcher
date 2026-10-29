@@ -12,6 +12,7 @@
 #include <sdk/os/file.h>
 #include <sdk/os/lcd.h>
 #include <string>
+#include <string_view>
 #include <type_traits>
 
 class Executable {
@@ -20,7 +21,14 @@ public:
   virtual void unload() = 0;
   virtual int execute() = 0;
   virtual std::unique_ptr<char[]> getName() { return getPath(); }
-  virtual std::unique_ptr<char[]> getPath() = 0;
+  virtual std::string_view pathView() const = 0;
+  std::unique_ptr<char[]> getPath() {
+    const auto value = pathView();
+    auto result = std::make_unique<char[]>(value.size() + 1);
+    std::copy(value.begin(), value.end(), result.get());
+    result[value.size()] = '\0';
+    return result;
+  }
   virtual std::unique_ptr<char[]> getVersion() { return nullptr; }
   virtual std::unique_ptr<char[]> getAuthor() { return nullptr; }
   virtual std::unique_ptr<char[]> getDescription() { return nullptr; }
@@ -50,12 +58,7 @@ public:
           return uptr;
         }()),
         file(this->path.get(), "rb") {}
-  std::unique_ptr<char[]> getPath() override {
-    const auto len = std::char_traits<char>::length(path.get()) + 1;
-    auto path = std::make_unique<char[]>(len);
-    std::copy_n(this->path.get(), len, path.get());
-    return path;
-  }
+  std::string_view pathView() const override { return path.get(); }
 
   static constexpr auto ext = EXT;
 };

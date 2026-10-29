@@ -7,7 +7,7 @@ std::forward_list<std::unique_ptr<Executable>> discover_apps() {
   std::forward_list<std::unique_ptr<Executable>> list;
   discover<ELFLoader>::run(list);
   list.sort([](const auto &a, const auto &b) {
-    return std::strcmp(a->getPath().get(), b->getPath().get()) < 0;
+    return a->pathView() < b->pathView();
   });
   return list;
 }

@@ -1,98 +1,62 @@
 Hollyhock 3 Custom Launcher 0.5 - test report
+Validation date: 2026-10-29
 
 Scope
 -----
 HH3 launcher for installed Hollyhock 3 on OS 02.01.7002.0001.
-Hardware testing: NOT performed. No complete Casio OS emulation is claimed.
+Fresh big-endian SuperH build with the pinned GCC 15.2.0 toolchain.
+Hardware testing: NOT performed. Calculator startup timings and persistent
+MCS behavior still require verification on a real ClassPad.
 
-Launcher behavior
------------------
-The launcher discovers and loads HH3 apps from the calculator root directory.
-The classic interface handles touch events and physical keys directly.
-The checked return adapter returns Cancel (0x03eb) to the OS 7002 caller at
-0x8015c898 and resumes the normal path at 0x8015cf94. A different caller
-signature retains the native completion dialog; errors remain explicit.
+Automated checks: 76 passed
+--------------------------
+21 UI controller/renderer checks, including touch capture, dragging,
+   key repeat, scrolling, 25000 mixed events and framebuffer bounds.
+ 7 real GUI adapter checks, including a 1000-app menu, lazy detail queries,
+   cached revisits and EXE launch of the preselected recent entry.
+ 4 discovery checks: HH3-only filtering, sorting, hidden files/directories,
+   unsupported-only files and complete enumeration of 1000 apps.
+17 real ELF metadata checks: buffered reads, cached getters, multiple
+   segments, missing metadata, unterminated note values and repeat-safe
+   rejection of truncated headers, overflowed sizes and invalid segments.
+14 MCS history checks: round-trip storage, five-entry MRU, duplicates,
+   missing apps, filename case, invalid paths, unavailable storage,
+   write errors, maximum path lengths and 10000 malformed records.
+ 5 launch integration checks using the real main() and history code:
+   restore history before selection, no write when closing, no write after
+   failed loading, write before execution, non-fatal MCS write failure,
+   display restoration and explicit errors after failed app execution.
+ 6 exit-result factory checks, including every mismatching caller byte,
+   unexpected OS result constants, repeated completion and error dialogs.
+ 2 narrow target SH consumer checks against the freshly linked ELF and
+   run.bin: the actual object/callback reaches the normal OS continuation;
+   the null-result regression faults at the expected object dereference.
 
-Automated checks: 36 passed
----------------------------
-UI: 21 controller/renderer checks and 4 real gui.cpp adapter checks, using
-ASan and UBSan. LeakSanitizer is disabled because hosted environments may
-block its inspection of /proc threads.
-Discovery: 3 checks against production app_list.cpp and the actual file
-search template; OS enumeration is mocked and ELF execution is replaced
-by assertion stubs. Checks cover mixed formats, unsupported-only files,
-sorting, hidden files and directories. No app is loaded or executed.
-Exit: 6 tests of the actual exit-result factory and native fallback under
-UBSan. The real-address ROM probe conflicts with ASan shadow memory.
-Target: 2 narrow SH instruction-consumer checks use the actual return
-object and callback from the linked target image. They reach the normal
-OS continuation; the old null-return regression faults at address 0x4c.
-This limited interpreter does not simulate the rest of the calculator.
+Host probes use AddressSanitizer and UndefinedBehaviorSanitizer, except
+for the exit-result probe, whose fixed ROM address overlaps ASan shadow
+memory and therefore uses UBSan. LeakSanitizer is disabled. OS entrypoints,
+file enumeration, MCS and app execution are mocked where applicable.
+The target instruction consumer does not emulate the complete calculator.
 
-Repository cleanup validation: 2026-10-29
------------------------------------------
-All 34 host checks and both target-consumer checks passed again.
-The target-consumer checks used the distributed ELF and raw binary;
-host nm output was normalized for the SH leading-underscore convention.
-The executable, retained launcher/SDK sources, smoke app and previews
-are unchanged. No fresh calculator build was performed for this cleanup.
+Measured file operations
+------------------------
+Same native-endian ELF32 fixture, four standard app metadata notes.
+Baseline source: 11ebaaab52b13bf3566850580777756574d27ed6.
+Before: fopen 1, fread 14, fseek 11.
+After:  fopen 1, fread  3, fseek  4.
+Warm metadata getters perform zero additional file operations in both.
+All 1000 app names remain available; the new GUI initially requests only
+one app's three detail fields and caches subsequent selections.
+These are host operation counts, not calculator wall-clock measurements.
+See PERFORMANCE.md for the measurement method.
 
 Build and distribution checks
 -----------------------------
-SuperH big-endian ELF32; machine EM_SH; entry 0x8cfd0000.
-The image remains within the reserved launcher RAM.
-The linked ELF contains only the HH3 app loader.
-The bundled HH3 SDK and HH3 smoke app build with the pinned toolchain.
-The archives are checked for CRC, matching binary hashes and absence of
-unsupported app-loader sources and firmware/updater files.
-Renderer previews are generated by the production renderer on the host.
-
-Individual check output
------------------------
-
-UI and real GUI adapter
-PASS empty list cannot start; Close remains active
-PASS dropdown selects tapped row
-PASS selector toggles dropdown
-PASS outside tap dismisses without click-through
-PASS short DOWN-UP tap starts exactly once; no duration threshold
-PASS small stylus movement is tolerated
-PASS dragging away cancels button activation and pressed appearance
-PASS invalid lift/movement coordinate cannot invalidate captured tap
-PASS arrow selection and EXE launch
-PASS selection remains in bounds on key repeat
-PASS dropdown confirmation does not double-launch on held EXE
-PASS keyboard focus reaches Close
-PASS Clear closes dropdown first and then launcher
-PASS title X closes launcher
-PASS dropdown drag scrolls without selecting an app
-PASS keyboard paging reaches final apps
-PASS scroll arrows advance one row
-PASS 1000 queued tap pairs preserve all transitions
-PASS renderer respects framebuffer boundaries with open dropdown
-PASS long text, UTF-8, malformed text and clipped canvas remain bounded
-PASS 25000 mixed input events preserve selection and scroll bounds
-21/21 checks passed
-PASS real adapter: short dropdown/Run taps with invalid lift coordinates choose second HH3 entry
-PASS real adapter: released EXE ignored; Down + EXE selects intended app
-PASS real adapter: idle events do not redraw or swallow the following tap
-PASS real adapter: drag cancellation followed by physical Clear exits
-4/4 adapter checks passed
-
-HH3 discovery
-PASS discovery: mixed directory lists and sorts only HH3 apps
-PASS discovery: only unsupported files yields an empty app list
-PASS discovery: directories and hidden entries are excluded
-3/3 discovery checks passed (mock file system; no app execution)
-
-Exit and target SH consumer
-PASS matched OS 7002 returns a non-null result consumed as Cancel, without a dialog
-PASS each of 32 mismatching caller bytes falls back to the native completion path
-PASS unexpected settings-result constant disables the silent return
-PASS repeated completions reuse a static result without opening native windows
-PASS other OS versions use the native path without reading the OS 7002 address
-PASS nonzero exits retain an explicit error dialog and avoid the silent return
-6/6 return-protocol checks passed
-PASS target SH image: actual return object/callback reaches normal OS continuation with Cancel
-PASS regression: old null return faults at OS object dereference +0x4c
-2/2 target-consumer checks passed (narrow SH interpreter; not a hardware test)
+The bundled SDK, launcher and HH3 smoke app compile successfully.
+ELF32, big-endian, EM_SH, entry 0x8cfd0000.
+App-code segment loading, cache maintenance and OS return behavior remain.
+The linked image stays below the reserved app RAM boundary at 0x8cff0000.
+The existing closed/open/empty renderer previews are pixel-identical;
+the additional recent-app preview shows the recent-entry list styling.
+ZIP CRC, embedded source snapshot, local Markdown links, metadata hashes
+and inner/outer SHA256 manifests are checked before publication.

@@ -33,9 +33,17 @@ Apps werden direkt im Hauptverzeichnis (`\fls0\`) gesucht, nicht in Unterordnern
 
 Beim normalen Beenden kehrt der Launcher zur vorherigen Casio-Ansicht zurück, normalerweise zum System-Menü. Erkennt er einen anderen Systemaufrufer, verwendet er den Casio-Abschlussdialog. Fehler werden weiterhin angezeigt.
 
+## Zuletzt gestartet
+
+Die fünf zuletzt gestarteten Apps stehen mit einem **\*** oben im Dropdown. Die übrigen Apps folgen in der gewohnten Reihenfolge, ohne doppelte Einträge. Die letzte App ist beim Öffnen direkt ausgewählt; **EXE** startet sie erneut.
+
+Der Verlauf wird im MCS gespeichert und erst aktualisiert, wenn eine App erfolgreich geladen wurde. Das Öffnen, Scrollen und Schließen des Launchers schreibt nichts. Entfernte oder umbenannte Apps werden übersprungen. Ist der Verlauf nicht verfügbar, bleibt die normale App-Auswahl nutzbar.
+
+![Dropdown mit zuletzt gestarteten Apps](preview/classic-recent.png)
+
 ## Teststand und Zurückwechseln
 
-Die automatisierten Prüfungen decken Oberfläche, Eingaben, App-Suche und den Rückgabeweg ab. **Ein abschließender Test am echten ClassPad steht noch aus.** Details stehen im Prüfbericht `TEST-REPORT.txt`.
+Die automatisierten Prüfungen decken Oberfläche, Eingaben, App-Suche, Metadaten, Verlauf, App-Start und den Rückgabeweg ab. **Ein abschließender Test am echten ClassPad steht noch aus**, einschließlich dauerhafter Verlaufsspeicherung und tatsächlicher Ladezeiten. Details stehen im Prüfbericht `TEST-REPORT.txt`.
 
 Zum Zurückwechseln die zuvor gesicherte `run.bin` zurückkopieren.
 

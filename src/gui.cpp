@@ -24,19 +24,23 @@ std::optional<classic::Key> translate(Input_Keycode code) {
 }
 
 std::unique_ptr<Executable>
-do_gui(std::forward_list<std::unique_ptr<Executable>> &executables) {
+do_gui(std::forward_list<std::unique_ptr<Executable>> &executables,
+       std::size_t recent_count) {
   std::vector<std::unique_ptr<Executable> *> entries;
   std::vector<classic::AppInfo> apps;
+  const auto count = static_cast<std::size_t>(std::distance(executables.begin(), executables.end()));
+  entries.reserve(count);
+  apps.reserve(count);
+  std::vector<bool> details_loaded(count, false);
   for (auto &exe : executables) {
     classic::AppInfo app;
-    app.path = text(exe->getPath());
+    app.path = exe->pathView();
+    app.recent = apps.size() < recent_count;
     try {
       app.name = text(exe->getName());
-      app.version = text(exe->getVersion());
-      app.author = text(exe->getAuthor());
-      app.description = text(exe->getDescription());
     } catch (const std::exception &error) {
       app.description = error.what();
+      details_loaded[apps.size()] = true;
     }
     if (app.name.empty()) app.name = app.path;
     entries.push_back(&exe);
@@ -49,6 +53,18 @@ do_gui(std::forward_list<std::unique_ptr<Executable>> &executables) {
   classic::State state(apps.size());
   bool dirty = true;
   while (state.action == classic::Action::None) {
+    if (state.selected >= 0 && !details_loaded[state.selected]) {
+      auto &app = apps[state.selected];
+      auto &exe = *entries[state.selected];
+      try {
+        app.version = text(exe->getVersion());
+        app.author = text(exe->getAuthor());
+        app.description = text(exe->getDescription());
+      } catch (const std::exception &error) {
+        app.description = error.what();
+      }
+      details_loaded[state.selected] = true;
+    }
     if (dirty) { classic::render(screen, state, apps); LCD_Refresh(); dirty = false; }
     // Service one blocking OS event queue immediately. No timer or competing
     // input consumer, and DOWN/UP transitions are never collapsed together.

@@ -59,6 +59,8 @@ int main(int argc, char **argv) {
     const std::string directory = argv[1];
     auto apps = sample(15); State normal(apps.size()); ppm(directory + "/classic-closed.ppm", normal, apps);
     tap(normal, 50, 55); ppm(directory + "/classic-open.ppm", normal, apps);
+    for (int i = 0; i < 3; ++i) apps[i].recent = true;
+    ppm(directory + "/classic-recent.ppm", normal, apps);
     State empty(0); ppm(directory + "/classic-empty.ppm", empty, {});
   }
   std::cout << passed << "/" << passed << " checks passed\n";

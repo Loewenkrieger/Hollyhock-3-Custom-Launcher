@@ -297,7 +297,11 @@ void render(Canvas canvas, const State &s, const std::vector<AppInfo> &apps) {
     const auto r = s.row_rect(row);
     const bool active = row == s.selected || (s.pressed == Target::Row && row == s.pressed_row);
     if (active) p.fill(r, blue);
-    p.text({r.x + 8, r.y + 4, r.w - 13, 20}, apps[row].name, active ? white : black);
+    if (row > 0 && !apps[row].recent && apps[row - 1].recent)
+      p.fill({r.x + 2, r.y, r.w - 4, 1}, edge);
+    const int inset = apps[row].recent ? 22 : 8;
+    if (apps[row].recent) p.text({r.x + 6, r.y + 4, 12, 20}, "*", active ? white : black);
+    p.text({r.x + inset, r.y + 4, r.w - inset - 5, 20}, apps[row].name, active ? white : black);
   }
   if (s.count > static_cast<std::size_t>(s.visible_rows())) {
     p.fill({282, box.y + 1, 22, box.h - 2}, body);

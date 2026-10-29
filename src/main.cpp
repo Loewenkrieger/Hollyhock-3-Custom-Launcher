@@ -1,9 +1,10 @@
 // for setenv from <stdlib.h>
-#include <functional>
 #define _POSIX_C_SOURCE 200112L
+#include <functional>
 #include "addresses.h"
 #include "app_list.hpp"
 #include "gui.hpp"
+#include "recent.hpp"
 #include "impl.hpp"
 #include "strconv.hpp"
 #include <alloca.h>
@@ -83,9 +84,11 @@ int main() {
   do_override();
 
   std::unique_ptr<Executable> chosen;
+  auto history = recent::load();
   {
     auto list = discover_apps();
-    chosen = do_gui(list);
+    const auto recent_count = recent::prioritize(list, history);
+    chosen = do_gui(list, recent_count);
   }
 
   if (!chosen)
@@ -94,6 +97,7 @@ int main() {
   calcExit();
   try {
     chosen->load();
+    recent::remember(chosen->pathView(), history);
     const auto ret = chosen->execute();
     chosen->unload();
     calcInit();

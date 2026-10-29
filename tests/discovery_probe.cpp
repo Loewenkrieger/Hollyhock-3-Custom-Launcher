@@ -78,5 +78,10 @@ int main() {
   assert((scan({{"folder.hh3", true}, {".hidden.hh3"}, {"visible.hh3"}}) ==
           std::vector<std::string>{"\\fls0\\visible.hh3"}));
   std::cout << "PASS discovery: directories and hidden entries are excluded\n";
-  std::cout << "3/3 discovery checks passed (mock file system; no app execution)\n";
+  std::vector<Entry> many;
+  for (int i = 999; i >= 0; --i) many.push_back({"app" + std::to_string(i) + ".hh3"});
+  const auto sorted = scan(std::move(many));
+  assert(sorted.size() == 1000 && std::is_sorted(sorted.begin(), sorted.end()));
+  std::cout << "PASS discovery: 1000 apps remain completely listed and sorted\n";
+  std::cout << "4/4 discovery checks passed (mock file system; no app execution)\n";
 }

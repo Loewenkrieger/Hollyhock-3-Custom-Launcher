@@ -9,10 +9,13 @@ Benötigt werden Linux, Python 3 und g++ mit C++23 sowie AddressSanitizer und Un
 ```sh
 python3 tests/test_classic.py
 python3 tests/test_discovery.py
+python3 tests/test_loader.py
+python3 tests/test_recent.py
+python3 tests/test_launch.py
 python3 tests/test_exit.py
 ```
 
-Die Tests prüfen die Oberfläche, Eingaben, HH3-App-Suche und den Rückgabeweg. Sie ersetzen keinen Test am Taschenrechner.
+Die Tests prüfen die Oberfläche, Eingaben, HH3-App-Suche, Metadaten, Verlauf, Startablauf und den Rückgabeweg. Sie ersetzen keinen Test am Taschenrechner. Messmethode und Ergebnisse stehen unter [PERFORMANCE.md](PERFORMANCE.md).
 
 ## Calculator-Build
 
@@ -40,3 +43,9 @@ Nur zum Neuerzeugen der Schrift wird Pillow benötigt:
 ```sh
 python3 generate_classic_font.py assets/DejaVuSans.ttf src/classic/font.hpp
 ```
+
+## Verlaufsformat
+
+Der Launcher verwendet ausschließlich den MCS-Ordner `hhlaunch` und die String-Variable `recent`. Der auf 512 Bytes begrenzte Eintrag beginnt mit `HH3REC1`, enthält höchstens fünf Dateipfade und endet mit einem NUL-Byte. Fehler beim Lesen oder Schreiben beeinflussen den App-Start nicht. Geschrieben wird einmal nach erfolgreichem Laden einer App, vor deren Ausführung.
+
+Die Implementierung nutzt die Byte-Typdeklaration `MCS_GetVariableU`, um die Typausgabe auch auf dem Big-Endian-System korrekt auszulesen. Grundlage: [MCS-SDK-Dokumentation](https://classpad.dev/wiki/hh3/reference/os/mcs/).
