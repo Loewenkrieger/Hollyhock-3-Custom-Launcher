@@ -43,7 +43,9 @@ entries = {'run.bin': run, 'BUILD.json': (json.dumps(metadata, indent=2) + '\n')
            'smoke/launcher-test.hh3': (ROOT / 'smoke/hh3/launcher-test.hh3').read_bytes()}
 for name in ['README_DE.md', 'TEST-REPORT.txt', 'PERFORMANCE.md']:
     entries[name] = (ROOT / 'docs' / name).read_bytes()
-entries['LICENSE'] = (ROOT / 'LICENSE').read_bytes()
+# Upstream notices are always included with the SDK sources below.
+if (ROOT / 'LICENSE').is_file():
+    entries['LICENSE'] = (ROOT / 'LICENSE').read_bytes()
 for path in (ROOT / 'docs/preview').glob('*.png'):
     entries['preview/' + path.name] = path.read_bytes()
 for name in info['files']:
