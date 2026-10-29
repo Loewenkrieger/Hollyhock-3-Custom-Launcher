@@ -22,7 +22,6 @@ Die fünf zuletzt gestarteten Apps stehen mit einem **\*** oben in der Liste. Di
 
 ![Vorschau der Oberfläche](docs/preview/classic-closed.png)
 
-Die Version wurde automatisiert geprüft; der abschließende Test am echten ClassPad steht noch aus.
 
 [Ausführliche Anleitung](docs/README_DE.md) · [Build und Tests](docs/BUILD.md) · [Prüfbericht](docs/TEST-REPORT.txt)
 
